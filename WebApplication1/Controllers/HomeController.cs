@@ -14,25 +14,31 @@ namespace WebApplication1.Controllers
     {
         public ActionResult Index()
         {
+            //Download Video From Youtube
             string url = "https://www.youtube.com/watch?v=bDuzU4XLEEs";
-            var youTube = YouTube.Default; // starting point for YouTube actions
-            var video = youTube.GetVideo(url); // gets a Video object with info about the video
-            
+            var youTube = YouTube.Default;
+            var video = youTube.GetVideo(url);
+            //------------
+            //Save Video
             //System.IO.File.WriteAllBytes(@"C:\Downloads\" + video.FullName, video.GetBytes());
-            var videoName = @"C:\Downloads\" + video.FullName;
+
+
+           
+
             var ffmpeg = new FFMpegConverter();
 
-            using (System.IO.Stream stream = new System.IO.FileStream(videoName, System.IO.FileMode.Open) )
+            using (System.IO.Stream stream = new System.IO.MemoryStream(video.GetBytes(), 0, video.GetBytes().Length))
             {
-               
-               var result =  ffmpeg.ConvertLiveMedia(stream, Format.mp4, @"C:\Downloads\result2.gif", Format.gif, new ConvertSettings() { VideoFrameRate = 1, MaxDuration = 10 });
-                result.Start();
+                System.IO.StreamWriter sw = new System.IO.StreamWriter(stream);
+   //             sw.Write(video.GetBytes(), 0, video.GetBytes().Length);
+
+               var result = ffmpeg.ConvertLiveMedia(stream, Format.mp4, @"C:\Downloads\result2.gif", Format.gif, new ConvertSettings() { VideoFrameRate = 1, MaxDuration = 10 });
+               result.Start();
+
             }
+
+            //var videoName = @"C:\Downloads\" + video.FullName;
             //ffmpeg.ConvertMedia(videoName, null, @"C:\Downloads\result.gif", null, new ConvertSettings() { VideoFrameRate = 1, MaxDuration = 10 });
-
-            
-            
-
 
             return View();
         }
